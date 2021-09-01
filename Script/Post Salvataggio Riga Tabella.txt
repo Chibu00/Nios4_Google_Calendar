@@ -1,0 +1,74 @@
+---------------------VALUES SET BY THE USER-------------------
+dataField= "*field name of the date on your events Nios4 Table*"
+startDataField= "*field name of the start date event on your events Nios4 table*"
+endDataField= "*field name of the end date event on your events Nios4 table*"
+idCalendarEventField = "*field name of the id calendar event in the event table on Nios4*"
+calendarNameField = "*Google Calendar field name in Info table*"
+tokenField = "*Google Calendar token field name in Info table*"
+refreshTokenField = "*refresh token field name in Info table*"
+titleField = "*title field name in Info table*"
+descriptionField = "*description field name in Info table*"
+idChannelField = "*id channel field name in Info table*"
+resourceIdField = "*resource id field name in Info table*"
+url = "*https://your_URL_/event.php*"
+
+date = datarow.getvalue(dataField)
+data = utility.datetostring(date)
+
+data_inizio    = datarow.getvalue(startDataField)
+start_date     = utility.datetostring(data_inizio)
+ore_inizio     = utility.datehour(data_inizio)
+minuti_inizio  = utility.dateminute(data_inizio)
+secondi_inizio = utility.datesecond(data_inizio)
+
+data_fine    = datarow.getvalue(endDataField)
+end_date     = utility.datetostring(data_fine)
+ore_fine     = utility.datehour(data_fine)
+minuti_fine  = utility.dateminute(data_fine)
+secondi_fine = utility.datesecond(data_fine)
+
+gguid             = datarow.getvalue("gguid")
+
+id_calendar_event = datarow.getvalue(idCalendarEventField)
+token_nios4       = program.usertoken()
+db                = database.name
+
+info_table            = database.getsql("SELECT * FROM info")
+info_rows             = info_table.getrows()
+calendar_name         = info_rows[1].getvalue(calendarNameField)
+token_google_calendar = info_rows[1].getvalue(tokenField)
+refresh_token         = info_rows[1].getvalue(refreshTokenField)
+gguid_info            = info_rows[1].getvalue("gguid")
+title_field           = info_rows[1].getvalue(titleField)
+description_field     = info_rows[1].getvalue(descriptionField)
+id_channel            = info_rows[1].getvalue(idChannelField)
+resource_id           = info_rows[1].getvalue(resourceIdField)
+
+title       = datarow.getvalue(title_field)
+description = datarow.getvalue(description_field)
+
+
+body = {}
+body["startDate"] = start_date
+body["oreInizio"] = ore_inizio
+body["minutiInizio"] = minuti_inizio
+body["secondiInizio"] = secondi_inizio
+body["endDate"] = end_date
+body["oreFine"] = ore_fine
+body["minutiFine"] = minuti_fine
+body["secondiFine"] = secondi_fine
+body["title"] = title
+body["description"] = description
+body["idEvent"] = id_calendar_event
+body["tokenCalendar"] = token_google_calendar
+body["refreshToken"] = refresh_token
+body["calendarName"] = calendar_name
+body["token_nios4"] = token_nios4
+body["db"] = db
+body["gguid"] = gguid
+body["gguidInfo"] = gguid_info
+body["idChannel"] = id_channel
+body["resourceId"] = resource_id
+
+http_request  = program.newhttprequest()
+value_request = http_request.sendpost(url, body, false)

@@ -1,0 +1,37 @@
+-------------------VALUES SET BY THE USER------------------------
+idCalendarEventField = "*field name of the id calendar event in the event table on Nios4*"
+calendarNameField = "*Google Calendar field name in Info table*"
+tokenField = "*Google Calendar token field name in Info table*"
+refreshTokenField = "*refresh token field name in Info table*"
+idChannelField = "*id channel field name in Info table*"
+resourceIdField = "*resource id field name in Info table*"
+url = "*https://your_URL_/delete.php*"
+
+--input
+id_calendar_event = datarow.getvalue(idCalendarEventField)
+token_nios4       = program.usertoken()
+db                = database.name
+
+info_table            = database.getsql("SELECT * FROM info")
+info_rows             = info_table.getrows()
+calendar_name         = info_rows[1].getvalue(calendarNameField)
+token_google_calendar = info_rows[1].getvalue(tokenField)
+refresh_token         = info_rows[1].getvalue(refreshTokenField)
+gguid_info            = info_rows[1].getvalue("gguid")
+id_channel            = info_rows[1].getvalue(idChannelField)
+resource_id           = info_rows[1].getvalue(resourceIdField)
+
+
+body = {}
+body["tokenGoogle"] = token_google_calendar
+body["refreshToken"] = refresh_token
+body["db"] = db
+body["tokenNios4"] = token_nios4
+body["gguidInfo"] = gguid_info
+body["idCalendarEvent"] = id_calendar_event
+body["calendarName"] = calendar_name
+body["idChannel"] = id_channel
+body["resourceId"] = resource_id
+
+http_request  = program.newhttprequest()
+value_request = http_request.sendpost(url, body, false)
