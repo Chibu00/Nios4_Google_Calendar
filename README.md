@@ -1,7 +1,7 @@
 # Nios4_Google_Calendar
 Connect Nios4 with Google Calendar via PHP
 
-ISTRUZIONI INTEGRAZIONE GOOGLE CALENDAR CON NIOS4
+ISTRUZIONI INTEGRAZIONE GOOGLE CALENDAR CON NIOS4. 
 Guida per l'integrazione del calendario di Google con il sistema gestionale Nios4.
 Attraverso questa guida, con semplici passaggi sarà in grado di far interagire il calendario di Google con Nios4 in maniera automatica.
 
