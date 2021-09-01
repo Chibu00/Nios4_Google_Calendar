@@ -5,7 +5,7 @@ ISTRUZIONI INTEGRAZIONE GOOGLE CALENDAR CON NIOS4.
 Guida per l'integrazione del calendario di Google con il sistema gestionale Nios4.
 Attraverso questa guida, con semplici passaggi sarà in grado di far interagire il calendario di Google con Nios4 in maniera automatica.
 
-PROCEDIMENTO CON GOOGLE
+PROCEDIMENTO CON GOOGLE. 
 La prima cosa necessaria sarà quello di avere o creare un account Google in modo tale da accedere alla sezione Developer di Google (https://developers.google.com/). Dopo di che, click in "View all developer products" e facendo una ricerca su "Calendar API" troverà tutta la documentazione di Google attraverso le API.
 Per gestire le integrazioni dovrà accedere alla Console Di Google Cloud (https://console.developers.google.com/) e creare un nuovo progetto.
 Dopo aver creato il progetto, cliccare su "ABILITA API" e fare una ricerca per "Google Calendar API". Cliccare sulla sezione e ABILITA il progetto.
@@ -24,7 +24,7 @@ e andranno aggiunti diversi parametri al link:
 Ricordarsi che i parametri all'interno del link sono tutti separati da "&".
 Una volta costruito il link basta eseguirlo in un browser qualsiasi, scegliere l'account con cui dare il consenso e l'autorizzazione per il collegamento a Nios4 e, dopo di che, il sistema restituirà un codice di autorizzazione.
 
-PROCEDIMETO CON NIOS4
+PROCEDIMETO CON NIOS4. 
 Attraverso la piattaforma di Nios4 bisognerà eseguire le seguenti modifiche:
 	- Creare dei nuovi campi dentro la tebella Info:
 		- codice di autorizzazione
@@ -45,8 +45,14 @@ Attraverso la piattaforma di Nios4 bisognerà eseguire le seguenti modifiche:
 
 	- Creare un nuovo campo dentro la tabella interessata per la visualizzazione dell'evento in agenda (per esempio nel caso di un Reportone la tabella sarà Rapporti Intervento). Questo campo sarà "ID Evento Calendario" che corrisponde all'id dello stesso evento su Google Calendar.
 
-Dopo aver creato questi campi e compilato a mano solo quelli necessari, copiare e eseguire tutti gli script che troverete nella cartella facendo attenzione ad inserire i dati relativi al proprio database e al proprio server.
-Il passo successivo sarà quello di creare le pagine .php dentro al proprio server. Queste pagine le troverà dentro la cartella apposita. Fare attenzione ad inserire i dati giusti corrispondenti al proprio lavoro.
+Dopo aver creato questi campi e compilato a mano solo quelli necessari, copiare e eseguire tutti gli script che troverete nella cartella facendo attenzione ad inserire i dati relativi al proprio database e al proprio server. Gli script saranno:
+	- Add_Update_Event_Card. Script che viene fatto alla tabella degli eventi in Nios4 come Post Salvataggio Scheda.
+	- Add_Update_Event_Table. Script che viene fatto alla tabella degli eventi in Nios4 come Post Salvataggio Riga Tabella.
+	- Delete_Event_Card. Script che viene fatto alla tabella degli eventi in Nios4 come Post Eliminazione Scheda.
+	- Delete_Event_Table. Script che viene fatto alla tabella degli eventi in Nios4 come Pre Eliminazione Riga Tabella.
+	- Authorization. Script che viene fatto attraverso l'Azione Programma.
+	
+Il passo successivo sarà quello di creare le pagine .php dentro al proprio server. Queste pagine le troverà dentro la cartella apposita (PHP_File). Fare attenzione ad inserire i dati giusti corrispondenti al proprio lavoro.
 Creare anche un nuovo database dentro al proprio server. Questo database deve contenere una tabella (nome a piacere) con le seguenti colonne:
 	- deve avere un contatore autoincrementale id.
 	- deve avere una colonna dove salvare il token relativo al proprio database su Nios4.
@@ -54,9 +60,9 @@ Creare anche un nuovo database dentro al proprio server. Questo database deve co
 	- deve avere una colonna dove salvare il Refresh Token relativo a Google Calendar.
 	- deve avere una colonna dove salvare il nome della tabella relativo agli eventi da visualizzare in agenda su Nios4.
 
-Dopo aver eseguito tutti gli script e aver creato tutte le pagine .php, si troverà un nuovo simbolo a forma di stella dentro a Nios4, dove cliccandoci troverà "Collega a Google Calendar". A questo punto, collegando Google Calendar a Nios4 si compileranno in maniera automatica tutti gli altri campi presenti in "I tuoi dati" nella tabella Info. Per vederli in maniera effettiva chiudere l'applicazione e riaprirla.
+Dopo aver eseguito tutti gli script e aver creato tutte le pagine .php, ci sarà un nuovo simbolo in alto a destra a forma di stella dentro il gestionale Nios4, dove cliccandoci troverà "Collega a Google Calendar". A questo punto, collegando Google Calendar a Nios4 si compileranno in maniera automatica tutti gli altri campi presenti in "I tuoi dati" nella tabella Info. Per vederli in maniera effettiva chiudere l'applicazione e riaprirla.
 
-COME FUNZIONA IL PROCEDIMENTO?
+COME FUNZIONA IL PROCEDIMENTO? 
 Eseguiti i procedimenti descritti precedentemente, ora Nios4 sarà collegata a Google Calendar. Quindi quando si cercherà di aggiungere, modificare o cancellare un nuovo evento in agenda da Nios4, automaticamente questo evento sarà aggiunto, modificato o cancellato in Google Calendar nel calendario specificato. Stesso identico procedimento in maniera inversa.
 ATTENZIONE: Quando si aggiunge un nuovo evento da Nios4 RICORDARSI DI SINCRONIZZARE IN MANIERA MANUALE il programma; altrimenti non riuscirebbe a identificare l'id dell'evento su Google Calendar e quindi non riuscirebbe a eseguire successive modifiche o cancellazioni dell'evento.
 
