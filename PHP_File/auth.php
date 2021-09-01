@@ -1,3 +1,4 @@
+<?php
 /*
 Copyright of Chibuzo Udoji 2021
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -12,7 +13,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
 */
 
-<?php
+
 include("connessione.php");
 $data= json_decode(file_get_contents('php://input'), true);
 
