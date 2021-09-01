@@ -1,0 +1,79 @@
+-----------------------VALUES SET BY THE USER--------------------------
+authCodeField = "*auth_code field name in Info table*"
+tokenField = "*Google Calendar token field name in Info table*"
+refreshTokenField = "*refresh token field name in Info table*"
+calendarNameField = "*Google Calendar field name in Info table*"
+idChannelField = "*id channel field name in Info table*"
+resourceIdField = "*resource id field name in Info table*"
+table_name  = "*the name of the table of the events in Nios4*"
+url = "*https://your_URL_/auth.php*"
+
+--input
+token_nios4 = program.usertoken()
+db          = database.name
+info_table  = database.getsql("SELECT * FROM info")
+info_rows   = info_table.getrows()
+
+code                  = info_rows[1].getvalue(authCodeField)
+token_google_calendar = info_rows[1].getvalue(tokenField)
+refresh_token         = info_rows[1].getvalue(refreshTokenField)
+calendar_name         = info_rows[1].getvalue(calendarNameField)
+gguid_info            = info_rows[1].getvalue("gguid")
+id_channel            = info_rows[1].getvalue(idChannelField)
+resource_id           = info_rows[1].getvalue(resourceIdField)
+
+if(code == "") then
+    
+    program.showerror("Inserire il codice di autorizzazione")
+    do return end
+        
+end
+    
+if(calendar_name == "") then
+    
+    program.showerror("Inserire il nome del calendario di Google Calendar")
+    do return end
+        
+end
+
+if(token_google_calendar ~= "" or refresh_token ~= "") then
+    
+    program.showwarning("Account già collegato a Google Calendar")
+    do return end
+        
+end
+
+data = {}
+data["code"] = code
+data["calendarName"] = calendar_name
+data["tokenNios4"] = token_nios4
+data["db"] = db
+data["gguid_info"] = gguid_info
+data["idChannel"] = id_channel
+data["resourceId"] = resource_id
+data["tableName"] = table_name
+
+http_request  = program.newhttprequest()
+value_request = http_request.sendpost(url, data, false)
+
+if(value_request == "NOCODE") then
+    
+    program.showerror("Codice di autorizzazione non valido")
+    do return end
+
+end
+    
+if(value_request == "NOCALENDAR") then
+    
+    program.showerror("Calendario non esistente. Inserire correttamente il nome del calendario")
+    do return end
+
+end
+    
+if(value_request == "OK") then
+    
+    program.showconfirm("Collegamento a Google Calendar avvenuto con successo")
+    program.forcesync()
+    do return end
+        
+end
