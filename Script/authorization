@@ -40,21 +40,21 @@ resource_id           = info_rows[1].getvalue(resourceIdField)
 
 if(code == "") then
     
-    program.showerror("Inserire il codice di autorizzazione")
+    program.showerror("Insert authorization code")
     do return end
         
 end
     
 if(calendar_name == "") then
     
-    program.showerror("Inserire il nome del calendario di Google Calendar")
+    program.showerror("Insert the name of Google Calendar")
     do return end
         
 end
 
 if(token_google_calendar ~= "" or refresh_token ~= "") then
     
-    program.showwarning("Account già collegato a Google Calendar")
+    program.showwarning("Account already connect to Google Calendar")
     do return end
         
 end
@@ -74,21 +74,21 @@ value_request = http_request.sendpost(url, data, false)
 
 if(value_request == "NOCODE") then
     
-    program.showerror("Codice di autorizzazione non valido")
+    program.showerror("Invalid Authorization Code")
     do return end
 
 end
     
 if(value_request == "NOCALENDAR") then
     
-    program.showerror("Calendario non esistente. Inserire correttamente il nome del calendario")
+    program.showerror("The Calendar doesn't exist. Insert the coorect name of the Calendar")
     do return end
 
 end
     
 if(value_request == "OK") then
     
-    program.showconfirm("Collegamento a Google Calendar avvenuto con successo")
+    program.showconfirm("Successfully connect to Google Calendar")
     program.forcesync()
     do return end
         
