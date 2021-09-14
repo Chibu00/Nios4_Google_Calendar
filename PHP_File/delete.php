@@ -39,7 +39,7 @@ $resourceId= $data["resourceId"];
 
 
 
-/////////////////////////////////////////METODI//////////////////////////////////////////////////////
+/////////////////////////////////////////METHODS//////////////////////////////////////////////////////
 //
 
 function saveChannelAndResource($database, $tokenNios4, $idRigaInfo, $idCanale, $idRisorsa, $IDChannelField, $resourceIDField) {
@@ -67,7 +67,7 @@ function saveChannelAndResource($database, $tokenNios4, $idRigaInfo, $idCanale, 
     
 }
 
-//funzione lista dei calendari su google calendar
+//function list of the calendars in Google Calendar
 function calendarList($token_calendario) {
     $urlCalendarList= "https://www.googleapis.com/calendar/v3/users/me/calendarList";
 
@@ -83,8 +83,8 @@ function calendarList($token_calendario) {
     
     return $responseCalendarList;
 }
-//fine funzione
-//funzione per  avere un nuovo token grazie al refresh token
+//end function
+//function get a new token with refresh token
 function refreshToken($refreshToken, $IDClient, $ClientSecret) {
     $urlRefreshToken= "https://oauth2.googleapis.com/token";
 
@@ -106,8 +106,8 @@ function refreshToken($refreshToken, $IDClient, $ClientSecret) {
     
     return $responseRefreshToken;
 }
-//fine funzione
-//funzione di salvataggio del token e del refresh dentro nios4
+//end function
+//function save token and refresh token inside nios4
 function saveToken($database, $tokenNios4, $idRigaInfo, $tokenCalendario, $refreshToken, $tokenField, $refreshTokenField) {
     $urlSaveToken= "https://web.nios4.com/ws/?action=table_save&db=".$database."&tablename=info&token=".$tokenNios4;
 
@@ -132,23 +132,23 @@ function saveToken($database, $tokenNios4, $idRigaInfo, $tokenCalendario, $refre
     
     
 }
-//fine funzione
-///////////////////////////////////////FINE METODI/////////////////////////////////////////////////////
+//end function
+///////////////////////////////////////END METHODS/////////////////////////////////////////////////////
 
 
-//lista dei calendari
+//calendar list
 $responseCalendarList= calendarList($tokenCalendar);
 
-//se mi da un errore può darsi che il token del calendario sia scaduto
+//if i get a error maybe the calendar token is expired
 if(array_key_exists("error", $responseCalendarList)) {
-    //faccio il refresh token in modo tale da avere il nuovo token    
+    //get a new token with the refresh token    
     $responseRefresh= refreshToken($refresh_token, $client_id, $client_secret);
     $tokenCalendar= $responseRefresh->access_token;
     
-    //salvo il nuovo token dentro Nios4    
+    //save the new token inside nios4 
     saveToken($db, $token, $gguidInfo, $tokenCalendar, $refresh_token, $tokenFieldNios4, $refreshTokenFieldNios4);
     
-    //faccio di nuovo la chiamata per avere la lista dei calendari in modo tale da prendermi id interessato    
+    //get the calendar list, so i can get the id calendar 
     $responseCalendarList= calendarList($tokenCalendar);
     
     $calendarList= $responseCalendarList->items;
@@ -159,7 +159,7 @@ if(array_key_exists("error", $responseCalendarList)) {
             $idCalendar= $value->id;
     }
     
-    //nuovo watch..cancello prima quello precedente
+    //get new watch.. first delete the previous one
     $urlStop= "https://www.googleapis.com/calendar/v3/channels/stop";
 
     $dataStop= json_encode(array(
@@ -217,7 +217,7 @@ if(array_key_exists("error", $responseCalendarList)) {
 }
 
 
-//eliminazione 
+//delete the event
 
 $urlDelete= "https://www.googleapis.com/calendar/v3/calendars/".$idCalendar."/events/".$idEvent;
 
