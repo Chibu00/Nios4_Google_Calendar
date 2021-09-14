@@ -52,7 +52,7 @@ $resourceId= $data["resourceId"];
 
 
 
-/////////////////////////////////////////METODI//////////////////////////////////////////////////////
+/////////////////////////////////////////METHODS//////////////////////////////////////////////////////
 //
 function saveChannelAndResource($database, $tokenNios4, $idRigaInfo, $idCanale, $idRisorsa, $IDChannelField, $resourceIDField) {
     $urlSaveCR= "https://web.nios4.com/ws/?action=table_save&db=".$database."&tablename=info&token=".$tokenNios4;
@@ -80,7 +80,7 @@ function saveChannelAndResource($database, $tokenNios4, $idRigaInfo, $idCanale, 
 }
 
 
-//funzione lista dei calendari su google calendar
+//function get calendar list
 function calendarList($token_calendario) {
     $urlCalendarList= "https://www.googleapis.com/calendar/v3/users/me/calendarList";
 
@@ -96,8 +96,8 @@ function calendarList($token_calendario) {
     
     return $responseCalendarList;
 }
-//fine funzione
-//funzione per  avere un nuovo token grazie al refresh token
+//end function
+//function get a new token with the refresh token
 function refreshToken($refreshToken, $IDClient, $ClientSecret) {
     $urlRefreshToken= "https://oauth2.googleapis.com/token";
 
@@ -119,8 +119,8 @@ function refreshToken($refreshToken, $IDClient, $ClientSecret) {
     
     return $responseRefreshToken;
 }
-//fine funzione
-//funzione di salvataggio del token e del refresh dentro nios4
+//end function
+//function save the token and the refresh token inside nios4
 function saveToken($database, $tokenNios4, $idRigaInfo, $tokenCalendario, $refreshToken, $tokenField, $refreshTokenField) {
     $urlSaveToken= "https://web.nios4.com/ws/?action=table_save&db=".$database."&tablename=info&token=".$tokenNios4;
 
@@ -145,8 +145,8 @@ function saveToken($database, $tokenNios4, $idRigaInfo, $tokenCalendario, $refre
     
     
 }
-//fine funzione
-//funzione di conversione della data in prendendo in ingresso la data gg/MM/YY, l'ora H, i minuti m, e i secondi s e come uscita YYYY-MM-ddTHH:mm:ss
+//end function
+//function convert date from dd/MM//YY format to YYYY-MM-ddTHH:mm:ss format
 function convertData($date, $ora, $minuti, $secondi) {
     $dataArray= explode("/", $date);
     $dataFormat= $dataArray[2]."-".$dataArray[1]."-".$dataArray[0];
@@ -167,10 +167,10 @@ function convertData($date, $ora, $minuti, $secondi) {
     
     return $dataFormat."T".$tempo;
 }
-//fine funzione
-///////////////////////////////////////FINE METODI/////////////////////////////////////////////////////
+//end function
+///////////////////////////////////////END METHODS/////////////////////////////////////////////////////
 
-//prima forza la sincronizzazione
+//force syncro
 $urlSync= "https://web.nios4.com/ws/?action=sync&db=".$db."&token=".$token;
 
 $chSync= curl_init();
@@ -180,19 +180,19 @@ curl_setopt($chSync, CURLOPT_RETURNTRANSFER, true);
 $responseSync= curl_exec($chSync);
 curl_close($chSync);
 
-//lista dei calendari
+//calendar list
 $responseCalendarList= calendarList($tokenCalendar);
 
-//se mi da un errore può darsi che il token del calendario sia scaduto oopure il channel sia scaduto
+//if i get some errors maybe the calendar token or the idchannel is expired
 if(array_key_exists("error", $responseCalendarList)) {
-    //faccio il refresh token in modo tale da avere il nuovo token    
+    //get a new token with the refresh token
     $responseRefresh= refreshToken($refresh_token, $client_id, $client_secret);
     $tokenCalendar= $responseRefresh->access_token;
     
-    //salvo il nuovo token dentro Nios4    
+    //save the new token inside nios4
     saveToken($db, $token, $gguidInfo, $tokenCalendar, $refresh_token, $tokenFieldNios4, $refreshTokenFieldNios4);
     
-    //faccio di nuovo la chiamata per avere la lista dei calendari in modo tale da prendermi id interessato    
+    //get the calenda list, so i can get the id calendar
     $responseCalendarList= calendarList($tokenCalendar);
     
     $calendarList= $responseCalendarList->items;
@@ -203,7 +203,7 @@ if(array_key_exists("error", $responseCalendarList)) {
             $idCalendar= $value->id;
     }
     
-    //nuovo watch..cancello prima quello precedente
+    //new watch.. first i delete the previous one
     $urlStop= "https://www.googleapis.com/calendar/v3/channels/stop";
 
     $dataStop= json_encode(array(
@@ -261,9 +261,9 @@ if(array_key_exists("error", $responseCalendarList)) {
 
 
 
-//guardo che valore ha l'id dell'evento del calendario
+//watch the value of the id event 
 if($idEvent == "") {
-    //vuol dire che non esiste. Devo aggiungerlo a Google Calendar
+    //the event doesn't exist. I have to add it on Google Calendar
     $urlNewEvent= "https://www.googleapis.com/calendar/v3/calendars/".$idCalendar."/events";
     
     $dataNewEvent= json_encode(array(
@@ -297,7 +297,7 @@ if($idEvent == "") {
     $idEvent= $responseNewEvent->id;
     
 } else {
-    //vuol dire che già esiste su Google Calendar. è una modifica di un evento già presente in Google Calendar
+    //The event already exist in Google Calendar. Edit the event.
     $urlUpdateEvent= "https://www.googleapis.com/calendar/v3/calendars/".$idCalendar."/events/".$idEvent;
     
     $dataUpdateEvent= json_encode(array(
