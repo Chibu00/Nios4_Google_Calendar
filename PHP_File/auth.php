@@ -46,8 +46,8 @@ $resourceId= $data["resourceId"];
 $tablename= $data["tableName"];
 
 
-///////////////////////////////////////METODI////////////////////////////////////////////////////////
-//funzione lista dei calendari su google calendar
+///////////////////////////////////////METHODS////////////////////////////////////////////////////////
+//function list of the calendars in Google Calendar
 function calendarList($token_calendario) {
     $urlCalendarList= "https://www.googleapis.com/calendar/v3/users/me/calendarList";
 
@@ -63,8 +63,8 @@ function calendarList($token_calendario) {
     
     return $responseCalendarList;
 }
-//fine funzione
-//funzione di salvataggio del token e del refresh dentro nios4
+//end function
+//function save token and refresh token inside nios4
 function saveToken($database, $tokenNios4, $idRigaInfo, $tokenCalendario, $refreshToken, $tokenField, $refreshTokenField) {
     $urlSaveToken= "https://web.nios4.com/ws/?action=table_save&db=".$database."&tablename=info&token=".$tokenNios4;
 
@@ -89,8 +89,8 @@ function saveToken($database, $tokenNios4, $idRigaInfo, $tokenCalendario, $refre
     
     
 }
-//fine funzione
-//funzione di salvataggio del della isChannel e della resourceid
+//end function
+//function save idchannel and resourceid
 function saveChannelAndResource($database, $tokenNios4, $idRigaInfo, $idCanale, $idRisorsa, $tokenSincro, $IDChannelField, $resourceIDField, $syncTokenField) {
     $urlSaveCR= "https://web.nios4.com/ws/?action=table_save&db=".$database."&tablename=info&token=".$tokenNios4;
 
@@ -116,14 +116,14 @@ function saveChannelAndResource($database, $tokenNios4, $idRigaInfo, $idCanale, 
     curl_close($chSaveCR);
     
 }
-//fine funzione
-////////////////////////////////////FINE METODI////////////////////////////////////////////////////////
+//end function
+////////////////////////////////////END METHODS////////////////////////////////////////////////////////
 
 
 
 
 
-//prima forza la sincronizzazione
+//force syncro
 $urlSync= "https://web.nios4.com/ws/?action=sync&db=".$db."&token=".$token;
 
 $chSync= curl_init();
@@ -133,7 +133,7 @@ curl_setopt($chSync, CURLOPT_RETURNTRANSFER, true);
 $responseSync= curl_exec($chSync);
 curl_close($chSync);
 
-//ricavo il token e il refresh token
+//find token and refresh token
 $url= "https://oauth2.googleapis.com/token";
 
 $data= "client_id=".$client_id."&"
@@ -163,7 +163,7 @@ saveToken($db, $token, $gguidInfo, $tokenCalendar, $refresh_token, $tokenFieldNi
 
 $responseCalendarList= calendarList($tokenCalendar);
 
-//trovo id del calendario
+//find calendar id
 $calendarList= $responseCalendarList->items;
 
 $idCalendar= "";
@@ -176,7 +176,7 @@ if($idCalendar == "") {
     exit("NOCALENDAR");
 }
 
-//prima stop del canale nel caso in cui esistesse
+//stop channel if exist
 if($idChannel != "" || $resourceId != "") {
     $urlStop= "https://www.googleapis.com/calendar/v3/channels/stop";
 
@@ -186,7 +186,7 @@ if($idChannel != "" || $resourceId != "") {
     ));
 }
 
-//creo il channel
+//create a new channel
 $urlWatch= "https://www.googleapis.com/calendar/v3/calendars/".$idCalendar."/events/watch";
 
 $chWatch= curl_init();
@@ -212,7 +212,7 @@ curl_close($chWatch);
 $idChannel= $responseWatch->id;
 $resourceId= $responseWatch->resourceId;
 
-//mi ricavo il synctoken che mi serve per sapere che tipo di variazione è stata fatta al calendario
+//find the synctoken: It's usefull for the next events change.
 $urlListEvents= "https://www.googleapis.com/calendar/v3/calendars/".$idCalendar."/events";
 
 $chListEvents= curl_init();
@@ -228,7 +228,7 @@ $syncToken= $responseListEvents->nextSyncToken;
 
 saveChannelAndResource($db, $token, $gguidInfo, $idChannel, $resourceId, $syncToken, $idChannelFieldNios4, $resourceIdFieldNios4, $syncTokenFieldNios4);
 
-//scrivo alcuni parametri in un mio db in modo tale da riprendere queste informazioni in notif.php
+//write some info in my own db, so i can catch this info for notif.php
 $sql= "SELECT * FROM ".$tableNameMySql." WHERE ".$databaseFieldMySql."='$db' AND ".$tokenNios4FieldMySql."='$token'";
 $resultset= $conn->query($sql);
 $righe= mysqli_fetch_all($resultset, MYSQLI_ASSOC);
