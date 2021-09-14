@@ -38,8 +38,8 @@ $startDataFieldNios4= "*field name of the start date event on your events Nios4 
 $endDataFieldNios4= "*field name of the start date event on your events Nios4 table*";
         
 
-///////////////////////////METODI/////////////////////////////////////
-//function per la generazione di un gguid
+///////////////////////////METHODS/////////////////////////////////////
+//function random gguid
 function randomGguid() {
     return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
         mt_rand(0, 0xffff), mt_rand(0, 0xffff),
@@ -75,7 +75,7 @@ function saveChannelAndResource($database, $tokenNios4, $idRigaInfo, $idCanale, 
     curl_close($chSaveCR);
     
 }
-//funzione per la converasione della data da Google Calendar a Nios4
+//funzione convert data from Google Calendar to Nios4
 function dataConversionFromGCtoNios($data) {
     $data_ora= explode("T", $data);
     
@@ -96,8 +96,8 @@ function dataConversionFromGCtoNios($data) {
     
     return $dataConverted;
 }
-//fine funzione
-//funzione che mi restituisce la lista dei campi di una cera tabella
+//end function
+//function list of the field sof a certain table
 function tableInfoFields($database, $nome_tabella, $token_nios4) {
     $url= "https://web.nios4.com/ws/?action=table_info&db=".$database."&tablename=".$nome_tabella."&token=".$token_nios4;
     
@@ -112,8 +112,8 @@ function tableInfoFields($database, $nome_tabella, $token_nios4) {
     
     return $infoCampi;
 }
-//fine funzione
-//funzione per trovare un cliente
+//end function
+//function find a customer
 function findCustomer($database, $nome_tabella_clienti, $token_nios4, $nome_campo_nominativo_cliente_dentro_cliente, $valore_del_campo_nominativo) {
     $urlModel= "https://web.nios4.com/ws/?action=model&db=".$database."&tablename=".$nome_tabella_clienti."&token=".$token_nios4;
 
@@ -136,8 +136,8 @@ function findCustomer($database, $nome_tabella_clienti, $token_nios4, $nome_camp
 
     return $cliente;
 }
-//fine funzione
-//funzione che ti aggiunge un nuovo cliente
+//end function
+//function add a customer
 function saveCustomer($database, $nome_tabella_clienti, $token_nios4, $gguidCliente, $campo_del_nome_cliente_dentro_tabella_clienti, $valore_nome_cliente) {
     $urlNewCustomer= "https://web.nios4.com/ws/?action=table_save&db=".$database."&tablename=".$nome_tabella_clienti."&token=".$token_nios4;
     $dataNewCustomer= json_encode(array(
@@ -158,7 +158,7 @@ function saveCustomer($database, $nome_tabella_clienti, $token_nios4, $gguidClie
     $responseNewCustomer= curl_exec($chNewCustomer);
     curl_close($chNewCustomer);
 }
-/////////////////////////////FINE METODI////////////////////////////////////
+/////////////////////////////END METHODS////////////////////////////////////
 
 
 
@@ -197,7 +197,7 @@ foreach ($righe as $keyR => $valueR) {
     
 }
 
-//prima forza la sincronizzazione
+//force syncro
 $urlSync= "https://web.nios4.com/ws/?action=sync&db=".$db."&token=".$token;
 
 $chSync= curl_init();
@@ -207,7 +207,7 @@ curl_setopt($chSync, CURLOPT_RETURNTRANSFER, true);
 $responseSync= curl_exec($chSync);
 curl_close($chSync);
 
-//lista dei calendari
+//calendar list
 $urlCalendarList= "https://www.googleapis.com/calendar/v3/users/me/calendarList";
 $chCalendarList= curl_init();
 
@@ -219,7 +219,7 @@ $responseCalendarList= curl_exec($chCalendarList);
 $responseCalendarList= json_decode($responseCalendarList);
 curl_close($chCalendarList);
 
-//se mi da un errore può darsi che il token del calendario sia scaduto oppure il watch sia scaduto
+//if i get a error maybe the calendar token or the watch are expired
 if(array_key_exists("error", $responseCalendarList)) {
     //faccio il refresh token in modo tale da avere il nuovo token
     $urlRefresh= "https://oauth2.googleapis.com/token";
@@ -242,7 +242,7 @@ if(array_key_exists("error", $responseCalendarList)) {
     
     $tokenCalendar= $responseRefresh->access_token;
     
-    //salvo il nuovo token dentro Nios4
+    //save the new token inside Nios4
     $urlSaveToken= "https://web.nios4.com/ws/?action=table_save&db=".$db."&tablename=info&token=".$token;
 
     $dataSaveToken= json_encode(array(
@@ -264,7 +264,7 @@ if(array_key_exists("error", $responseCalendarList)) {
     $responseSaveToken= curl_exec($chSaveToken);
     curl_close($chSaveToken);
     
-    //faccio di nuovo la chiamata per avere la lista dei calendari in modo tale da prendermi id interessato
+    //get calendar list, so i can get the id calendar
     $urlCalendarList= "https://www.googleapis.com/calendar/v3/users/me/calendarList";
     $chCalendarList= curl_init();
 
@@ -284,7 +284,7 @@ if(array_key_exists("error", $responseCalendarList)) {
             $idCalendar= $value->id;
     }
     
-    //nuovo watch..cancello prima quello precedente
+    //new watch.. but firs i delete the previous one
     $urlStop= "https://www.googleapis.com/calendar/v3/channels/stop";
 
     $dataStop= json_encode(array(
@@ -340,7 +340,7 @@ if(array_key_exists("error", $responseCalendarList)) {
     }
 }
 
-//eventi che hanno subito una variazione/nuovo
+//events the changes or new events
 $urlListEventsSync= "https://www.googleapis.com/calendar/v3/calendars/".$idCalendar."/events?syncToken=".$syncToken;
 
 $chListEventSync= curl_init();
@@ -354,7 +354,7 @@ curl_close($chListEventSync);
 
 $eventsItems= $responseListEventSync->items;
 
-//aggiorno il nuovo synctoken mettendo anche su Nios4
+//update the new synctoken
 $syncToken= $responseListEventSync->nextSyncToken;
 $urlSaveSyncToken= "https://web.nios4.com/ws/?action=table_save&db=".$db."&tablename=info&token=".$token;
 
@@ -399,7 +399,7 @@ foreach ($eventsItems as $keyItems => $valueItems) {
         
         $gguidEvento= $responseIdCalendar->records[0]->gguid;
         
-        //cancello l'evento su Nios4 facendo riferimento all'id del calendario
+        //delete the nios4 event with the id calendar
         $urlDeleteEvent= "https://web.nios4.com/ws/?action=table_save&db=".$db."&tablename=".$tablename."&token=".$token;
         
         $dataDeleteEvent= json_encode(array(
@@ -418,7 +418,7 @@ foreach ($eventsItems as $keyItems => $valueItems) {
         curl_close($chDeleteEvent);
         
     } else {
-        //ricavo tutte le righe della tabella da nios4 facendo la ricerca in base all'id dell'evento.
+        //get the table row of nios4 searching by the id event
         $urlInterventiList= "https://web.nios4.com/ws/?action=model&db=".$db."&tablename=".$tablename."&token=".$token;
         
         $dataInterventiList= json_encode(array(
@@ -439,9 +439,9 @@ foreach ($eventsItems as $keyItems => $valueItems) {
         $interventiList= $responseInterventiList->records;
         
         if(count($interventiList) == 0) {
-            //se la lista è vuota allora vuol dire che ho un nuovo evento
-            //nuovo evento
-            //serve per gestire la seconda chiamata a nios4 quando aggiungo un evento da nios4. In questo modo riesco a modificare il campo id_calendar_event senza far aggiunger un altra riga.
+            //if the list is empty, then i have a new event
+            //new event
+            //It's helpful to manage the second request to nios4 when i add a new event from nios4. In this case i can edit the field "id_calendar_event" without adding a new row.
             if(isset($valueItems->extendedProperties->private->Nios4)) {
                 
                 $cliente= findCustomer($db, $customerTable, $token, $title_field, $valueItems->summary);
@@ -517,7 +517,7 @@ foreach ($eventsItems as $keyItems => $valueItems) {
             }
             
         } else {
-            //se la lista non è vuota vuol dire che me ne ha trovato UNO su Nios4 e quindi vuol dire che devo modificarlo
+            // if the list is not empty then I found it ONE in Nios4, so I have to update it.
             $cliente= findCustomer($db, $customerTable, $token, $title_field, $valueItems->summary);
                 
             if(count($cliente) != 0) {
@@ -556,7 +556,7 @@ foreach ($eventsItems as $keyItems => $valueItems) {
             curl_close($chUpdateEvent);
         }
 
-        //forzo la sincronizzazione
+        //force syncro
         $urlSync= "https://web.nios4.com/ws/?action=sync&db=".$db."&token=".$token;
 
         $chSync= curl_init();
