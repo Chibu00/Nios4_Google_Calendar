@@ -21,7 +21,7 @@ if(!isset($data)) {
 
 $client_id= "*your client_id from Google*";
 $client_secret= "*your client secret from Google*";
-$webhook= "*your_URL_webhook/notif.php*";
+$webhook= "*your_URL_webhook/notif.php?idc=idCalendar*";
 $idChannelFieldNios4= "*your id channel field name in Info table on Nios4*";
 $resourceIdFieldNios4= "*your resource id field name in Info table on Nios4*";
 $tokenFieldNios4= "*your token name field in Info table on Nios4*";
@@ -41,7 +41,7 @@ $description= $data["description"];
 $idEvent= $data["idEvent"];
 $tokenCalendar= $data["tokenCalendar"];
 $refresh_token= $data["refreshToken"];
-$calendarName= $data["calendarName"];
+$idCalendar= $data["idCalendar"];
 $token= $data["token_nios4"];
 $db= $data["db"];
 $gguid= $data["gguid"];
@@ -192,17 +192,6 @@ if(array_key_exists("error", $responseCalendarList)) {
     //save the new token inside nios4
     saveToken($db, $token, $gguidInfo, $tokenCalendar, $refresh_token, $tokenFieldNios4, $refreshTokenFieldNios4);
     
-    //get the calenda list, so i can get the id calendar
-    $responseCalendarList= calendarList($tokenCalendar);
-    
-    $calendarList= $responseCalendarList->items;
-
-    $idCalendar= "";
-    foreach ($calendarList as $key => $value) {
-        if($value->summary == $calendarName)
-            $idCalendar= $value->id;
-    }
-    
     //new watch.. first i delete the previous one
     $urlStop= "https://www.googleapis.com/calendar/v3/channels/stop";
 
@@ -248,18 +237,7 @@ if(array_key_exists("error", $responseCalendarList)) {
     $resourceId= $responseWatch->resourceId;
     
     saveChannelAndResource($db, $token, $gguidInfo, $idChannel, $resourceId, $idChannelFieldNios4, $resourceIdFieldNios4);
-} else {
-    
-    $calendarList= $responseCalendarList->items;
-
-    $idCalendar= "";
-    foreach ($calendarList as $key => $value) {
-        if($value->summary == $calendarName)
-            $idCalendar= $value->id;
-    } 
 }
-
-
 
 //watch the value of the id event 
 if($idEvent == "") {
