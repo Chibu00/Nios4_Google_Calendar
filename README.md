@@ -30,7 +30,7 @@ Attraverso la piattaforma di Nios4 bisognerà eseguire le seguenti modifiche:
 		- codice di autorizzazione
 		- token di Google Calendar
 		- il refresh token di Google Calendar
-		- il nome del calendario
+		- ID del calendario di Google
 		- ID del Channel di Google Calendar
 		- ID della Risorsa di Google Calendar
 		- token di sincronizzazione di Google Calendar
@@ -59,6 +59,7 @@ Creare anche un nuovo database dentro al proprio server. Questo database deve co
 	- deve avere una colonna dove salvare il nome identificativo del database su Nios4.
 	- deve avere una colonna dove salvare il Refresh Token relativo a Google Calendar.
 	- deve avere una colonna dove salvare il nome della tabella relativo agli eventi da visualizzare in agenda su Nios4.
+	- deve avere una colonna relativa all'id del calendario di Google Calendar
 
 Dopo aver eseguito tutti gli script e aver creato tutte le pagine .php, ci sarà un nuovo simbolo in alto a destra a forma di stella dentro il gestionale Nios4, dove cliccandoci troverà "Collega a Google Calendar". A questo punto, collegando Google Calendar a Nios4 si compileranno in maniera automatica tutti gli altri campi presenti in "I tuoi dati" nella tabella Info. Per vederli in maniera effettiva chiudere l'applicazione e riaprirla.
 
