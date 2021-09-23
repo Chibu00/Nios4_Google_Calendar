@@ -29,7 +29,7 @@ $databaseFieldMySql= "*the field name of your database name column on your mySQL
 $tokenNios4FieldMySql= "*the field name of your token Nios4 column on your mySQL*";
 $refreshTokenFieldMySql= "*the field name of your refresh token column on your mySQL*";
 $idFieldMySql= "*the field name of your id column on your mySQL*";
-$tableNameFieldMySql= "*the field name of your table name column on your mySQL*";
+$idCalendarFieldMySql= "*the field name of your id calendar info column on your mySQL*";
 $tokenFieldNios4= "*your token name field in Info table on Nios4*";
 $refreshTokenFieldNios4= "*your refresh token field name in Info table on Nios4*";
 $syncTokenFieldNios4= "*your sync token field name in Info table on Nios4*";
@@ -40,7 +40,7 @@ $token= $data["tokenNios4"];
 $db= $data["db"];
 $code= $data["code"];
 $gguidInfo= $data["gguid_info"];
-$calendarName= $data["calendarName"];
+$idCalendar= $data["idCalendario"]
 $idChannel= $data["idChannel"];
 $resourceId= $data["resourceId"];
 $tablename= $data["tableName"];
@@ -161,17 +161,6 @@ $refresh_token= $response->refresh_token;
 
 saveToken($db, $token, $gguidInfo, $tokenCalendar, $refresh_token, $tokenFieldNios4, $refreshTokenFieldNios4);
 
-$responseCalendarList= calendarList($tokenCalendar);
-
-//find calendar id
-$calendarList= $responseCalendarList->items;
-
-$idCalendar= "";
-foreach ($calendarList as $key => $value) {
-    if($value->summary == $calendarName)
-        $idCalendar= $value->id;
-}
-
 if($idCalendar == "") {
     exit("NOCALENDAR");
 }
@@ -184,6 +173,16 @@ if($idChannel != "" || $resourceId != "") {
         "id" => $idChannel,
         "resourceId" => $resourceId,
     ));
+    
+    $chStop= curl_init();
+    curl_setopt($chStop, CURLOPT_URL, $urlStop);
+    curl_setopt($chStop, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($chStop, CURLOPT_POST, true);
+    curl_setopt($chStop, CURLOPT_POSTFIELDS, $dataStop);
+    curl_setopt($chStop, CURLOPT_HTTPHEADER, ["Authorization: Bearer ".$tokenCalendar.", Content-Type: application/json"]);
+    
+    $responseStop= curl_exec($chStop);
+    curl_close($chStop);
 }
 
 //create a new channel
@@ -234,8 +233,8 @@ $resultset= $conn->query($sql);
 $righe= mysqli_fetch_all($resultset, MYSQLI_ASSOC);
 
 if(count($righe) == 0) {
-    $sql2= "INSERT INTO ".$tableNameMySql." (".$tokenNios4FieldMySql.", ".$databaseFieldMySql.", ".$refreshTokenFieldMySql.", ".$tableNameFieldMySql.") "
-            . "VALUES ('$token', '$db', '$refresh_token', '$tablename')";
+    $sql2= "INSERT INTO ".$tableNameMySql." (".$tokenNios4FieldMySql.", ".$databaseFieldMySql.", ".$refreshTokenFieldMySql.", ".$tableNameFieldMySql.", ".$idCalendarFieldMySql.") "
+            . "VALUES ('$token', '$db', '$refresh_token', '$tablename', '$idCalendar')";
     
     $resultset2= $conn->query($sql2);
 } else {
