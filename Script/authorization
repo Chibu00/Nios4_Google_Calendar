@@ -18,7 +18,7 @@
 authCodeField = "*auth_code field name in Info table*"
 tokenField = "*Google Calendar token field name in Info table*"
 refreshTokenField = "*refresh token field name in Info table*"
-calendarNameField = "*Google Calendar field name in Info table*"
+idCalendarField = "*Google Calendar Id field name in Info table*"
 idChannelField = "*id channel field name in Info table*"
 resourceIdField = "*resource id field name in Info table*"
 table_name  = "*the name of the table of the events in Nios4*"
@@ -33,7 +33,7 @@ info_rows   = info_table.getrows()
 code                  = info_rows[1].getvalue(authCodeField)
 token_google_calendar = info_rows[1].getvalue(tokenField)
 refresh_token         = info_rows[1].getvalue(refreshTokenField)
-calendar_name         = info_rows[1].getvalue(calendarNameField)
+id_calendar           = info_rows[1].getvalue(idCalendarField)
 gguid_info            = info_rows[1].getvalue("gguid")
 id_channel            = info_rows[1].getvalue(idChannelField)
 resource_id           = info_rows[1].getvalue(resourceIdField)
@@ -67,7 +67,7 @@ data["db"] = db
 data["gguid_info"] = gguid_info
 data["idChannel"] = id_channel
 data["resourceId"] = resource_id
-data["tableName"] = table_name
+data["idCalendar"] = id_calendar
 
 http_request  = program.newhttprequest()
 value_request = http_request.sendpost(url, data, false)
