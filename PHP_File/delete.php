@@ -21,7 +21,7 @@ if(!isset($data)) {
 
 $client_id= "*your client_id from Google*";
 $client_secret= "*your client secret from Google*";
-$webhook= "*your_URL_webhook/notif.php*";
+$webhook= "*your_URL_webhook/notif.php?idc=idCalendar*";
 $idChannelFieldNios4= "*your id channel field name in Info table on Nios4*";
 $resourceIdFieldNios4= "*your resource id field name in Info table on Nios4*";
 $tokenFieldNios4= "*your token name field in Info table on Nios4*";
