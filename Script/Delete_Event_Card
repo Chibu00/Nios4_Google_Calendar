@@ -16,7 +16,7 @@
 
 -----------------------VALUES SET BY THE USER----------------------------
 idCalendarEventField = "*field name of the id calendar event in the event table on Nios4*"
-calendarNameField = "*Google Calendar field name in Info table*"
+idCalendarField = "*Google Calendar Id field name in Info table*"
 tokenField = "*Google Calendar token field name in Info table*"
 refreshTokenField = "*refresh token field name in Info table*"
 idChannelField = "*id channel field name in Info table*"
@@ -30,7 +30,7 @@ db                = database.name
 
 info_table            = database.getsql("SELECT * FROM info")
 info_rows             = info_table.getrows()
-calendar_name         = info_rows[1].getvalue(calendarNameField)
+id_calendar           = info_rows[1].getvalue(idCalendarField)
 token_google_calendar = info_rows[1].getvalue(tokenField)
 refresh_token         = info_rows[1].getvalue(refreshTokenField)
 gguid_info            = info_rows[1].getvalue("gguid")
@@ -44,7 +44,7 @@ body["db"] = db
 body["tokenNios4"] = token_nios4
 body["gguidInfo"] = gguid_info
 body["idCalendarEvent"] = id_calendar_event
-body["calendarName"] = calendar_name
+body["idCalendar"] = id_calendar
 body["idChannel"] = id_channel
 body["resourceId"] = resource_id
 
