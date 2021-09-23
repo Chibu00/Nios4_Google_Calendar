@@ -23,15 +23,15 @@ $resourceIdFieldNios4= "*your resource id field name in Info table on Nios4*";
 $tableNameMySql= "*the name of the table on your mySQL*";
 $databaseFieldMySql= "*the field name of your database name column on your mySQL*";
 $tokenNios4FieldMySql= "*the field name of your token Nios4 column on your mySQL*";
+$idCalendarFieldMySql= "*the field name of your id calendar info column on your mySQL*";
 $refreshTokenFieldMySql= "*the field name of your refresh token column on your mySQL*";
-$tableNameFieldMySql= "*the field name of your table name column on your mySQL*";
 $refreshTokenFieldNios4= "*your refresh token field name in Info table on Nios4*";
 $calendarNameFieldNios4= "*your calendar name field name in Info table on Nios4*";
 $tokenFieldNios4= "*your token name field in Info table on Nios4*";
 $syncTokenFieldNios4= "*your sync token field name in Info table on Nios4*";
 $titleFieldNios4= "*your title field name in Info table on Nios4*";
 $descriptionFieldNios4= "*your description field name in Info table on Nios4*";
-$webhook= "*your_URL_webhook/notif.php*";
+$webhook= "*your_URL_webhook/notif.php?idc=idCalendar*";
 $idCalendarEventFieldNios4= "*your id calendar event field name in your event table on Nios4*";
 $dataFieldNios4= "*field name of the date on your events Nios4 Table*";
 $startDataFieldNios4= "*field name of the start date event on your events Nios4 table*";
@@ -160,15 +160,15 @@ function saveCustomer($database, $nome_tabella_clienti, $token_nios4, $gguidClie
 }
 /////////////////////////////END METHODS////////////////////////////////////
 
+$idCalendar= $_GET["idc"];
 
 
-
-$sql= "SELECT * FROM ".$tableNameMySql."";
+$sql= "SELECT * FROM ".$tableNameMySql." WHERE ".$idCalendarFieldMySql." = '$idCalendar';
 $resultset= $conn->query($sql);
 $righe= mysqli_fetch_all($resultset, MYSQLI_ASSOC);
 
-foreach ($righe as $keyR => $valueR) {
-    $urlInfo= "https://web.nios4.com/ws/?action=model&db=".$valueR[$databaseFieldMySql]."&tablename=info&token=".$valueR[$tokenNios4FieldMySql];
+if(count($righe) != 0) {
+    $urlInfo= "https://web.nios4.com/ws/?action=model&db=".$righe[0][$databaseFieldMySql]."&tablename=info&token=".$righe[0][$tokenNios4FieldMySql];
     
     $chInfo= curl_init();
     curl_setopt($chInfo, CURLOPT_URL, $urlInfo);
@@ -179,9 +179,8 @@ foreach ($righe as $keyR => $valueR) {
     curl_close($chInfo);
     
     $info= $responseInfo->records[0];
-    if(isset($info->$refreshTokenFieldNios4) && $info->$refreshTokenFieldNios4 == $valueR[$refreshTokenFieldMySql]) {
+    if(isset($info->$idCalendarFieldMySql) && $info->$idCalendarFieldMySql == $righe[0][$idCalendarFieldMySql]) {
         $refresh_token= $info->$refreshTokenFieldNios4;
-        $calendarName= $info->$calendarNameFieldNios4;
         $tokenCalendar= $info->$tokenFieldNios4;
         $resourceId= $info->$resourceIdFieldNios4;
         $idChannel= $info->$idChannelFieldNios4;
@@ -189,12 +188,14 @@ foreach ($righe as $keyR => $valueR) {
         $gguidInfo= $info->gguid;
         $title_field= $info->$titleFieldNios4;
         $description_field= $info->$descriptionFieldNios4;
-        $db= $valueR[$databaseFieldMySql];
-        $token= $valueR[$tokenNios4FieldMySql];
-        $tablename= $valueR["$tableNameFieldMySql"];
-        break;
+        $db= $righe[0][$databaseFieldMySql];
+        $token= $righe[0][$tokenNios4FieldMySql];
+        $tablename= $righe[0]["$tableNameFieldMySql"];
+
     }
     
+} else {
+        exit();
 }
 
 //force syncro
@@ -220,8 +221,8 @@ $responseCalendarList= json_decode($responseCalendarList);
 curl_close($chCalendarList);
 
 //if i get a error maybe the calendar token or the watch are expired
-if(array_key_exists("error", $responseCalendarList)) {
-    //faccio il refresh token in modo tale da avere il nuovo token
+if(array_key_exists("error", $responseListEventSync)) {
+    
     $urlRefresh= "https://oauth2.googleapis.com/token";
 
     $chRefresh= curl_init();
@@ -249,8 +250,8 @@ if(array_key_exists("error", $responseCalendarList)) {
         "rows" => array(
             [
                 "gguid" => $gguidInfo,
-                $tokenFieldNios4 => $tokenCalendar,
-                $refreshTokenFieldNios4 => $refresh_token
+                "token" => $tokenCalendar,
+                "refresh_token" => $refresh_token
             ]
         )
     ));
@@ -264,27 +265,19 @@ if(array_key_exists("error", $responseCalendarList)) {
     $responseSaveToken= curl_exec($chSaveToken);
     curl_close($chSaveToken);
     
-    //get calendar list, so i can get the id calendar
-    $urlCalendarList= "https://www.googleapis.com/calendar/v3/users/me/calendarList";
-    $chCalendarList= curl_init();
 
-    curl_setopt($chCalendarList, CURLOPT_URL, $urlCalendarList);
-    curl_setopt($chCalendarList, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($chCalendarList, CURLOPT_HTTPHEADER, ["Authorization: Bearer ".$tokenCalendar]);
+    $urlListEventsSync= "https://www.googleapis.com/calendar/v3/calendars/".$idCalendar."/events?syncToken=".$syncToken;
 
-    $responseCalendarList= curl_exec($chCalendarList);
-    $responseCalendarList= json_decode($responseCalendarList);
-    curl_close($chCalendarList);
+    $chListEventSync= curl_init();
+    curl_setopt($chListEventSync, CURLOPT_URL, $urlListEventsSync);
+    curl_setopt($chListEventSync, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($chListEventSync, CURLOPT_HTTPHEADER, ["Authorization: Bearer ".$tokenCalendar]);
+
+    $responseListEventSync= curl_exec($chListEventSync);
+    $responseListEventSync= json_decode($responseListEventSync);
+    curl_close($chListEventSync);
     
-    $calendarList= $responseCalendarList->items;
-
-    $idCalendar= "";
-    foreach ($calendarList as $key => $value) {
-        if($value->summary == $calendarName)
-            $idCalendar= $value->id;
-    }
-    
-    //new watch.. but firs i delete the previous one
+    //new watch.. but first i delete the previous one
     $urlStop= "https://www.googleapis.com/calendar/v3/channels/stop";
 
     $dataStop= json_encode(array(
@@ -328,29 +321,8 @@ if(array_key_exists("error", $responseCalendarList)) {
     $idChannel= $responseWatch->id;
     $resourceId= $responseWatch->resourceId;
     
-    saveChannelAndResource($db, $token, $gguidInfo, $idChannel, $resourceId, $idChannelFieldNios4, $resourceIdFieldNios4);
-    
-} else {
-    $calendarList= $responseCalendarList->items;
-
-    $idCalendar= "";
-    foreach ($calendarList as $key => $value) {
-        if($value->summary == $calendarName)
-            $idCalendar= $value->id;
-    }
+    saveChannelAndResource($db, $token, $gguidInfo, $idChannel, $resourceId);
 }
-
-//events the changes or new events
-$urlListEventsSync= "https://www.googleapis.com/calendar/v3/calendars/".$idCalendar."/events?syncToken=".$syncToken;
-
-$chListEventSync= curl_init();
-curl_setopt($chListEventSync, CURLOPT_URL, $urlListEventsSync);
-curl_setopt($chListEventSync, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($chListEventSync, CURLOPT_HTTPHEADER, ["Authorization: Bearer ".$tokenCalendar]);
-
-$responseListEventSync= curl_exec($chListEventSync);
-$responseListEventSync= json_decode($responseListEventSync);
-curl_close($chListEventSync);
 
 $eventsItems= $responseListEventSync->items;
 
@@ -379,7 +351,7 @@ curl_close($chSaveSyncToken);
 
 foreach ($eventsItems as $keyItems => $valueItems) {
     if($valueItems->status == "cancelled") {
-        //recupero il gguid dell'evento attraverso l'id del calendario
+
         $urlIdCalendar= "https://web.nios4.com/ws/?action=model&db=".$db."&tablename=".$tablename."&token=".$token;
         
         $dataIdCalendar= json_encode(array(
