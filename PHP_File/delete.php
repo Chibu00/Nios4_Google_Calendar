@@ -33,7 +33,7 @@ $db= $data["db"];
 $token= $data["tokenNios4"];
 $gguidInfo= $data["gguidInfo"];
 $idEvent= $data["idCalendarEvent"];
-$calendarName= $data["calendarName"];
+$idCalendar= $data["idCalendar"];
 $idChannel= $data["idChannel"];
 $resourceId= $data["resourceId"];
 
@@ -148,17 +148,6 @@ if(array_key_exists("error", $responseCalendarList)) {
     //save the new token inside nios4 
     saveToken($db, $token, $gguidInfo, $tokenCalendar, $refresh_token, $tokenFieldNios4, $refreshTokenFieldNios4);
     
-    //get the calendar list, so i can get the id calendar 
-    $responseCalendarList= calendarList($tokenCalendar);
-    
-    $calendarList= $responseCalendarList->items;
-
-    $idCalendar= "";
-    foreach ($calendarList as $key => $value) {
-        if($value->summary == $calendarName)
-            $idCalendar= $value->id;
-    }
-    
     //get new watch.. first delete the previous one
     $urlStop= "https://www.googleapis.com/calendar/v3/channels/stop";
 
@@ -205,15 +194,6 @@ if(array_key_exists("error", $responseCalendarList)) {
     
     saveChannelAndResource($db, $token, $gguidInfo, $idChannel, $resourceId, $idChannelFieldNios4, $resourceIdFieldNios4);
     
-} else {
-    $calendarList= $responseCalendarList->items;
-
-    $idCalendar= "";
-    foreach ($calendarList as $key => $value) {
-        if($value->summary == $calendarName)
-            $idCalendar= $value->id;
-    }
-
 }
 
 
