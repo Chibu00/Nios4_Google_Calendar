@@ -39,7 +39,7 @@ Attraverso la piattaforma di Nios4 bisognerà eseguire le seguenti modifiche:
 
 	I campi da compilare manualmente saranno:
 		- il codice di autorizzazione. è il codice ricavato precedentemente attraverso il consenso e l'auotrizzazione.
-		- il nome del calendario. è il nome del calendario su Google Calendar. Nel caso in cui il calendario sia quello di default, il nome corrisponderà all'email collegata.
+		- id del calendario. Lo si può trovare direttamente nelle impostazioni di Google Calendar.
 		- il campo che serve per la visualizzazione del titolo dell'evento. Per esempio per un ipotetico seme Reportone il valore di questo campo potrebbe essere "nome_cliente" che è il campo presente nella tabella "interventi_tecnici".
 		- il campo che serve per la visualizzazione della descrizione dell'evento. Per esempio per un ipotetico seme Reportone il valore di questo campo potrebbe essere difetto" che è il campo presente nella tabella "interventi_tecnici".
 
