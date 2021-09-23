@@ -23,7 +23,7 @@ if(!isset($data)) {
 
 $client_id= "*your client_id from Google*";
 $client_secret= "*your client secret from Google*";
-$webhook= "*your_URL_webhook/notif.php*";
+$webhook= "*your_URL_webhook/notif.php?idc=idCalendar*";
 $tableNameMySql= "*the name of the table on your mySQL*";
 $databaseFieldMySql= "*the field name of your database name column on your mySQL*";
 $tokenNios4FieldMySql= "*the field name of your token Nios4 column on your mySQL*";
